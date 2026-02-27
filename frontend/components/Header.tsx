@@ -1,6 +1,14 @@
+import Link from "next/link";
 import { STATS } from "@/lib/data";
+import { createClient } from "@/lib/supabase/server";
+import { signOut } from "@/app/actions/auth";
 
-export default function Header() {
+export default async function Header() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <header
       className="sticky top-0 z-40 w-full border-b"
@@ -37,13 +45,63 @@ export default function Header() {
             </div>
           </div>
 
-          {/* 실시간 통계 */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <StatBadge label={`${STATS.totalCities}도시`} />
-            <StatBadge
-              label={`${STATS.totalRatings.toLocaleString()}평가`}
+          {/* 우측 영역: 통계 + 인증 */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* 실시간 통계 */}
+            <div className="flex items-center gap-2">
+              <StatBadge label={`${STATS.totalCities}도시`} />
+              <StatBadge
+                label={`${STATS.totalRatings.toLocaleString()}평가`}
+              />
+              <LiveBadge />
+            </div>
+
+            {/* 구분선 */}
+            <div
+              className="hidden sm:block w-px h-5"
+              style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
             />
-            <LiveBadge />
+
+            {/* 로그인/로그아웃 영역 */}
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-xs"
+                  style={{
+                    color: "#8b9bb4",
+                    fontFamily: "var(--font-space-mono)",
+                  }}
+                >
+                  {user.user_metadata?.nickname ?? user.email}
+                </span>
+                <form action={signOut}>
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                    style={{
+                      backgroundColor: "rgba(0, 201, 167, 0.1)",
+                      color: "#00c9a7",
+                      border: "1px solid rgba(0, 201, 167, 0.3)",
+                      fontFamily: "var(--font-space-mono)",
+                    }}
+                  >
+                    로그아웃
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                style={{
+                  backgroundColor: "#00c9a7",
+                  color: "#0a0f1e",
+                  fontFamily: "var(--font-space-mono)",
+                }}
+              >
+                로그인
+              </Link>
+            )}
           </div>
         </div>
       </div>
