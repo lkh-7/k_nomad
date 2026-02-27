@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signUp } from "@/app/actions/auth";
 
 export default function RegisterPage() {
@@ -13,7 +12,6 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const router = useRouter();
 
   const inputStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -50,7 +48,6 @@ export default function RegisterPage() {
     } else {
       setSuccess(true);
       setLoading(false);
-      setTimeout(() => router.push("/login"), 3000);
     }
   };
 
@@ -123,7 +120,7 @@ export default function RegisterPage() {
                 회원가입이 완료되었습니다!
               </h3>
               <p className="text-sm" style={{ color: "#8b9bb4" }}>
-                로그인 페이지로 이동합니다...
+                로그인 페이지로 이동하세요
               </p>
               <Link
                 href="/login"
