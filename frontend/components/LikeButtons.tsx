@@ -5,15 +5,11 @@ import { useState } from "react";
 interface LikeButtonsProps {
   likes: number;
   dislikes: number;
-  rating: number;
-  onRatingClick: () => void;
 }
 
 export default function LikeButtons({
   likes,
   dislikes,
-  rating,
-  onRatingClick,
 }: LikeButtonsProps) {
   const [localLikes, setLocalLikes] = useState(likes);
   const [localDislikes, setLocalDislikes] = useState(dislikes);
@@ -21,7 +17,11 @@ export default function LikeButtons({
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (voted === "like") return;
+    if (voted === "like") {
+      setVoted(null);
+      setLocalLikes((prev) => prev - 1);
+      return;
+    }
     setLocalLikes((prev) => prev + 1);
     if (voted === "dislike") setLocalDislikes((prev) => prev - 1);
     setVoted("like");
@@ -29,7 +29,11 @@ export default function LikeButtons({
 
   const handleDislike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (voted === "dislike") return;
+    if (voted === "dislike") {
+      setVoted(null);
+      setLocalDislikes((prev) => prev - 1);
+      return;
+    }
     setLocalDislikes((prev) => prev + 1);
     if (voted === "like") setLocalLikes((prev) => prev - 1);
     setVoted("dislike");
@@ -83,21 +87,6 @@ export default function LikeButtons({
           </span>
         </button>
       </div>
-
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onRatingClick();
-        }}
-        className="flex items-center gap-1 text-xs transition-all hover:opacity-80"
-        style={{ color: "#eab308" }}
-      >
-        <span>★</span>
-        <span style={{ fontFamily: "var(--font-space-mono)" }}>
-          {rating.toFixed(1)}
-        </span>
-        <span style={{ color: "#8b9bb4" }}>평가하기</span>
-      </button>
     </div>
   );
 }

@@ -1,30 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { City, TagType } from "@/types/city";
-import ScoreBar from "./ScoreBar";
+import { City } from "@/types/city";
 import LikeButtons from "./LikeButtons";
-import RatingModal from "./RatingModal";
 
-const TAG_CONFIG: Record<
-  TagType,
-  { icon: string; color: string; bg: string }
-> = {
-  바다: { icon: "🌊", color: "#38bdf8", bg: "rgba(56, 189, 248, 0.12)" },
-  "산/자연": { icon: "⛰️", color: "#4ade80", bg: "rgba(74, 222, 128, 0.12)" },
-  도심: { icon: "🏙️", color: "#a78bfa", bg: "rgba(167, 139, 250, 0.12)" },
-  저렴: { icon: "💰", color: "#fbbf24", bg: "rgba(251, 191, 36, 0.12)" },
-  카공: { icon: "☕", color: "#fb923c", bg: "rgba(251, 146, 60, 0.12)" },
-};
-
-const SCORE_LABELS = [
-  { key: "cafe" as const, label: "카공", icon: "☕" },
-  { key: "internet" as const, label: "인터넷", icon: "📶" },
-  { key: "safety" as const, label: "안전도", icon: "🔒" },
-  { key: "price" as const, label: "물가", icon: "💰" },
-  { key: "nature" as const, label: "자연", icon: "🌿" },
-];
+const CITY_INFO = [
+  { label: "월 예산", key: "budget" },
+  { label: "지역", key: "regionCategory" },
+  { label: "환경", key: "environment" },
+  { label: "추천 계절", key: "bestSeason" },
+] as const;
 
 interface CityCardProps {
   city: City;
@@ -32,11 +17,9 @@ interface CityCardProps {
 }
 
 export default function CityCard({ city, animationDelay }: CityCardProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const isTop3 = city.rank <= 3;
 
   return (
-    <>
       <article
         className="card-animate rounded-xl overflow-hidden cursor-pointer group transition-all duration-300"
         style={{
@@ -140,50 +123,22 @@ export default function CityCard({ city, animationDelay }: CityCardProps) {
             </span>
           </div>
 
-          {/* 날씨 / 좋아요 / 별점 */}
+          {/* 날씨 / 좋아요 */}
           <div className="flex items-center gap-3 text-xs" style={{ color: "#8b9bb4" }}>
             <span>
               {city.weather.emoji} {city.weather.temp}°C
             </span>
             <span>👍 {city.likes.toLocaleString()}</span>
-            <span style={{ color: "#eab308" }}>
-              ★{" "}
-              <span style={{ fontFamily: "var(--font-space-mono)" }}>
-                {city.rating.toFixed(1)}
-              </span>
-            </span>
           </div>
 
-          {/* 점수 바 */}
-          <div className="space-y-1.5">
-            {SCORE_LABELS.map((item) => (
-              <ScoreBar
-                key={item.key}
-                label={item.label}
-                icon={item.icon}
-                score={city.scores[item.key]}
-              />
+          {/* Key-Value 정보 */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+            {CITY_INFO.map(({ label, key }) => (
+              <div key={label}>
+                <p style={{ color: "#8b9bb4" }}>{label}</p>
+                <p style={{ color: "#f0f4ff", fontWeight: 500 }}>{city[key]}</p>
+              </div>
             ))}
-          </div>
-
-          {/* 태그 칩 */}
-          <div className="flex flex-wrap gap-1.5">
-            {city.tags.slice(0, 3).map((tag) => {
-              const cfg = TAG_CONFIG[tag];
-              return (
-                <span
-                  key={tag}
-                  className="px-2 py-0.5 rounded-full text-xs"
-                  style={{
-                    backgroundColor: cfg.bg,
-                    color: cfg.color,
-                    border: `1px solid ${cfg.color}33`,
-                  }}
-                >
-                  {cfg.icon} {tag}
-                </span>
-              );
-            })}
           </div>
         </div>
 
@@ -191,16 +146,7 @@ export default function CityCard({ city, animationDelay }: CityCardProps) {
         <LikeButtons
           likes={city.likes}
           dislikes={city.dislikes}
-          rating={city.rating}
-          onRatingClick={() => setIsModalOpen(true)}
         />
       </article>
-
-      <RatingModal
-        city={city}
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-    </>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FilterType, SortType } from "@/types/city";
-import { City } from "@/types/city";
+import { City, SortType } from "@/types/city";
 import CityGrid from "./CityGrid";
 import {
   Select,
@@ -12,13 +11,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const FILTERS: { label: string; value: FilterType }[] = [
-  { label: "전체", value: "전체" },
-  { label: "🌊 바다", value: "바다" },
-  { label: "⛰️ 산/자연", value: "산/자연" },
-  { label: "🏙️ 도심", value: "도심" },
-  { label: "💰 저렴", value: "저렴" },
-  { label: "☕ 카공", value: "카공" },
+const FILTER_CONFIGS = [
+  {
+    key: "budget" as const,
+    label: "예산",
+    options: ["전체", "100만원 이하", "100~200만원", "200만원 이상"],
+  },
+  {
+    key: "region" as const,
+    label: "지역",
+    options: ["전체", "수도권", "경상도", "전라도", "강원도", "제주도", "충청도"],
+  },
+  {
+    key: "environment" as const,
+    label: "환경",
+    options: ["전체", "자연친화", "도심선호", "카페작업", "코워킹필수"],
+  },
+  {
+    key: "season" as const,
+    label: "계절",
+    options: ["전체", "봄", "여름", "가을", "겨울"],
+  },
 ];
 
 const SORTS: { label: string; value: SortType }[] = [
@@ -34,8 +47,17 @@ interface FilterBarProps {
 }
 
 export default function FilterBar({ cities }: FilterBarProps) {
-  const [activeFilter, setActiveFilter] = useState<FilterType>("전체");
-  const [sortBy, setSortBy] = useState<SortType>("nomadScore");
+  const [filters, setFilters] = useState({
+    budget: "전체",
+    region: "전체",
+    environment: "전체",
+    season: "전체",
+  });
+  const [sortBy, setSortBy] = useState<SortType>("likes");
+
+  const setFilter = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
 
   return (
     <div className="space-y-4">
@@ -49,27 +71,49 @@ export default function FilterBar({ cities }: FilterBarProps) {
         }}
       >
         <div className="mx-auto max-w-screen-xl flex items-center gap-3 flex-wrap">
-          {/* 필터 칩 */}
+          {/* 4개 필터 드롭다운 */}
           <div className="flex items-center gap-2 flex-wrap flex-1">
-            {FILTERS.map((f) => {
-              const active = activeFilter === f.value;
+            {FILTER_CONFIGS.map((config) => {
+              const isActive = filters[config.key] !== "전체";
               return (
-                <button
-                  key={f.value}
-                  onClick={() => setActiveFilter(f.value)}
-                  className="px-3 py-1.5 rounded-full text-sm font-medium transition-all"
-                  style={{
-                    backgroundColor: active
-                      ? "#00c9a7"
-                      : "rgba(255,255,255,0.06)",
-                    color: active ? "#0a0f1e" : "#8b9bb4",
-                    border: active
-                      ? "1px solid #00c9a7"
-                      : "1px solid rgba(255,255,255,0.1)",
-                  }}
+                <Select
+                  key={config.key}
+                  value={filters[config.key]}
+                  onValueChange={(v) => setFilter(config.key, v)}
                 >
-                  {f.label}
-                </button>
+                  <SelectTrigger
+                    className="w-36 text-sm"
+                    style={{
+                      backgroundColor: isActive
+                        ? "rgba(0, 201, 167, 0.15)"
+                        : "rgba(255,255,255,0.06)",
+                      border: isActive
+                        ? "1px solid rgba(0, 201, 167, 0.4)"
+                        : "1px solid rgba(255,255,255,0.1)",
+                      color: isActive ? "#00c9a7" : "#f0f4ff",
+                    }}
+                  >
+                    <SelectValue placeholder={config.label} />
+                  </SelectTrigger>
+                  <SelectContent
+                    style={{
+                      backgroundColor: "#1a2235",
+                      border: "1px solid rgba(0, 201, 167, 0.2)",
+                      color: "#f0f4ff",
+                    }}
+                  >
+                    {config.options.map((option) => (
+                      <SelectItem
+                        key={option}
+                        value={option}
+                        className="text-sm cursor-pointer"
+                        style={{ color: "#f0f4ff" }}
+                      >
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               );
             })}
           </div>
@@ -112,7 +156,7 @@ export default function FilterBar({ cities }: FilterBarProps) {
       </div>
 
       {/* 도시 그리드 */}
-      <CityGrid cities={cities} activeFilter={activeFilter} sortBy={sortBy} />
+      <CityGrid cities={cities} filters={filters} sortBy={sortBy} />
     </div>
   );
 }

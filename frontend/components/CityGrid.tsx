@@ -1,23 +1,29 @@
 "use client";
 
 import { useMemo } from "react";
-import { City, FilterType, SortType, TagType } from "@/types/city";
+import { City, SortType } from "@/types/city";
 import CityCard from "./CityCard";
 
 interface CityGridProps {
   cities: City[];
-  activeFilter: FilterType;
+  filters: {
+    budget: string;
+    region: string;
+    environment: string;
+    season: string;
+  };
   sortBy: SortType;
 }
 
-export default function CityGrid({ cities, activeFilter, sortBy }: CityGridProps) {
+export default function CityGrid({ cities, filters, sortBy }: CityGridProps) {
   const filtered = useMemo(() => {
     let result = [...cities];
 
-    // 필터링
-    if (activeFilter !== "전체") {
-      result = result.filter((c) => c.tags.includes(activeFilter as TagType));
-    }
+    // 필터링 (AND 조건)
+    if (filters.budget !== "전체") result = result.filter((c) => c.budget === filters.budget);
+    if (filters.region !== "전체") result = result.filter((c) => c.regionCategory === filters.region);
+    if (filters.environment !== "전체") result = result.filter((c) => c.environment === filters.environment);
+    if (filters.season !== "전체") result = result.filter((c) => c.bestSeason === filters.season);
 
     // 정렬
     switch (sortBy) {
@@ -39,14 +45,14 @@ export default function CityGrid({ cities, activeFilter, sortBy }: CityGridProps
     }
 
     return result;
-  }, [cities, activeFilter, sortBy]);
+  }, [cities, filters, sortBy]);
 
   if (filtered.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <p className="text-4xl mb-4">🏙️</p>
         <p className="text-base font-medium" style={{ color: "#8b9bb4" }}>
-          해당 필터에 맞는 도시가 없습니다
+          조건에 맞는 도시가 없습니다
         </p>
         <p className="text-sm mt-1" style={{ color: "#4a5a70" }}>
           다른 필터를 선택해보세요

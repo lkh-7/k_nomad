@@ -8,6 +8,12 @@ export default function HomePage() {
       <Header />
 
       <main className="mx-auto max-w-screen-xl px-4 py-6">
+        <h2
+          className="text-xl font-bold mb-4"
+          style={{ color: "#f0f4ff" }}
+        >
+          도시리스트
+        </h2>
         <FilterBar cities={CITIES} />
       </main>
 
