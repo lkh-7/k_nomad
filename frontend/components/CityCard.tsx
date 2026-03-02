@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { City } from "@/types/city";
 import LikeButtons from "./LikeButtons";
 
@@ -41,6 +42,7 @@ export default function CityCard({ city, animationDelay }: CityCardProps) {
             "rgba(255,255,255,0.07)";
         }}
       >
+        <Link href={`/cities/${city.id}`} className="block">
         {/* 이미지 영역 */}
         <div className="relative h-40 overflow-hidden">
           <Image
@@ -141,6 +143,7 @@ export default function CityCard({ city, animationDelay }: CityCardProps) {
             ))}
           </div>
         </div>
+        </Link>
 
         {/* 카드 푸터 */}
         <LikeButtons
