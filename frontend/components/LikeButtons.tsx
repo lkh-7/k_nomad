@@ -44,8 +44,7 @@ export default function LikeButtons({
       className="flex items-center justify-between px-3 py-2 rounded-b-xl"
       style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <div className="flex items-center gap-2">
-        <button
+      <button
           onClick={handleLike}
           className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-all"
           style={{
@@ -81,12 +80,11 @@ export default function LikeButtons({
                 : "1px solid transparent",
           }}
         >
-          👎{" "}
           <span style={{ fontFamily: "var(--font-space-mono)" }}>
             {localDislikes}
-          </span>
+          </span>{" "}
+          👎
         </button>
-      </div>
     </div>
   );
 }

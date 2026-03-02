@@ -72,7 +72,7 @@ export default function FilterBar({ cities }: FilterBarProps) {
       >
         <div className="mx-auto max-w-screen-xl flex items-center gap-3 flex-wrap">
           {/* 4개 필터 드롭다운 */}
-          <div className="flex items-center gap-2 flex-wrap flex-1">
+          <div className="grid grid-cols-4 gap-2 flex-1">
             {FILTER_CONFIGS.map((config) => {
               const isActive = filters[config.key] !== "전체";
               return (
@@ -82,7 +82,7 @@ export default function FilterBar({ cities }: FilterBarProps) {
                   onValueChange={(v) => setFilter(config.key, v)}
                 >
                   <SelectTrigger
-                    className="w-36 text-sm"
+                    className="w-full text-sm"
                     style={{
                       backgroundColor: isActive
                         ? "rgba(0, 201, 167, 0.15)"
