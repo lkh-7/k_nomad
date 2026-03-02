@@ -48,3 +48,8 @@ desktop.ini
 *.ntvs*
 *.njsproj
 *.sln
+
+# ===========================
+# Claude Code 내부
+# ===========================
+.claude/worktrees/
