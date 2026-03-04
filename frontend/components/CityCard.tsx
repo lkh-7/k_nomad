@@ -15,9 +15,10 @@ const CITY_INFO = [
 interface CityCardProps {
   city: City;
   animationDelay: number;
+  votes: { likes: number; dislikes: number };
 }
 
-export default function CityCard({ city, animationDelay }: CityCardProps) {
+export default function CityCard({ city, animationDelay, votes }: CityCardProps) {
   const isTop3 = city.rank <= 3;
 
   return (
@@ -130,7 +131,7 @@ export default function CityCard({ city, animationDelay }: CityCardProps) {
             <span>
               {city.weather.emoji} {city.weather.temp}°C
             </span>
-            <span>👍 {city.likes.toLocaleString()}</span>
+            <span>👍 {votes.likes.toLocaleString()}</span>
           </div>
 
           {/* Key-Value 정보 */}
@@ -147,8 +148,9 @@ export default function CityCard({ city, animationDelay }: CityCardProps) {
 
         {/* 카드 푸터 */}
         <LikeButtons
-          likes={city.likes}
-          dislikes={city.dislikes}
+          cityId={city.id}
+          likes={votes.likes}
+          dislikes={votes.dislikes}
         />
       </article>
   );

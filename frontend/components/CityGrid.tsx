@@ -6,6 +6,7 @@ import CityCard from "./CityCard";
 
 interface CityGridProps {
   cities: City[];
+  votesMap: Record<number, { likes: number; dislikes: number }>;
   filters: {
     budget: string;
     region: string;
@@ -15,7 +16,7 @@ interface CityGridProps {
   sortBy: SortType;
 }
 
-export default function CityGrid({ cities, filters, sortBy }: CityGridProps) {
+export default function CityGrid({ cities, votesMap, filters, sortBy }: CityGridProps) {
   const filtered = useMemo(() => {
     let result = [...cities];
 
@@ -40,12 +41,16 @@ export default function CityGrid({ cities, filters, sortBy }: CityGridProps) {
         result.sort((a, b) => b.internetSpeed - a.internetSpeed);
         break;
       case "likes":
-        result.sort((a, b) => b.likes - a.likes);
+        result.sort((a, b) => {
+          const aLikes = votesMap[a.id]?.likes ?? a.likes;
+          const bLikes = votesMap[b.id]?.likes ?? b.likes;
+          return bLikes - aLikes;
+        });
         break;
     }
 
     return result;
-  }, [cities, filters, sortBy]);
+  }, [cities, votesMap, filters, sortBy]);
 
   if (filtered.length === 0) {
     return (
@@ -68,6 +73,7 @@ export default function CityGrid({ cities, filters, sortBy }: CityGridProps) {
           key={city.id}
           city={city}
           animationDelay={idx * 50}
+          votes={votesMap[city.id] ?? { likes: city.likes, dislikes: city.dislikes }}
         />
       ))}
     </div>

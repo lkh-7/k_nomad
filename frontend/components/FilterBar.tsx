@@ -44,9 +44,10 @@ const SORTS: { label: string; value: SortType }[] = [
 
 interface FilterBarProps {
   cities: City[];
+  votesMap: Record<number, { likes: number; dislikes: number }>;
 }
 
-export default function FilterBar({ cities }: FilterBarProps) {
+export default function FilterBar({ cities, votesMap }: FilterBarProps) {
   const [filters, setFilters] = useState({
     budget: "전체",
     region: "전체",
@@ -156,7 +157,7 @@ export default function FilterBar({ cities }: FilterBarProps) {
       </div>
 
       {/* 도시 그리드 */}
-      <CityGrid cities={cities} filters={filters} sortBy={sortBy} />
+      <CityGrid cities={cities} votesMap={votesMap} filters={filters} sortBy={sortBy} />
     </div>
   );
 }

@@ -1,8 +1,22 @@
+import { createClient } from "@supabase/supabase-js";
 import { CITIES } from "@/lib/data";
 import Header from "@/components/Header";
 import FilterBar from "@/components/FilterBar";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: votesData } = await supabase.from("city_votes").select("*");
+  const votesMap: Record<number, { likes: number; dislikes: number }> = {};
+  for (const row of votesData ?? []) {
+    votesMap[row.city_id] = { likes: row.likes, dislikes: row.dislikes };
+  }
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -14,7 +28,7 @@ export default function HomePage() {
         >
           도시리스트
         </h2>
-        <FilterBar cities={CITIES} />
+        <FilterBar cities={CITIES} votesMap={votesMap} />
       </main>
 
       <footer

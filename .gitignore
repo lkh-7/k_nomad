@@ -52,4 +52,8 @@ desktop.ini
 # ===========================
 # Claude Code 내부
 # ===========================
+.credentials.json
+mcp-needs-auth-cache.json
 .claude/worktrees/
+.mcp.json
+.env*

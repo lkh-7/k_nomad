@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 import { CITIES } from "@/lib/data";
 import LikeButtons from "@/components/LikeButtons";
 
-export function generateStaticParams() {
-  return CITIES.map((city) => ({ id: String(city.id) }));
-}
+export const dynamic = "force-dynamic";
 
 const SCORE_LABELS: { key: keyof typeof CITIES[0]["scores"]; label: string }[] = [
   { key: "cafe", label: "카공환경" },
@@ -25,6 +24,17 @@ export default async function CityDetailPage({ params }: PageProps) {
   const city = CITIES.find((c) => c.id === Number(id));
 
   if (!city) notFound();
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  const { data: voteRow } = await supabase
+    .from("city_votes")
+    .select("likes, dislikes")
+    .eq("city_id", city.id)
+    .single();
+  const votes = voteRow ?? { likes: city.likes, dislikes: city.dislikes };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0a0f1a" }}>
@@ -195,7 +205,7 @@ export default async function CityDetailPage({ params }: PageProps) {
           className="rounded-xl overflow-hidden"
           style={{ backgroundColor: "#111827", border: "1px solid rgba(255,255,255,0.07)" }}
         >
-          <LikeButtons likes={city.likes} dislikes={city.dislikes} />
+          <LikeButtons cityId={city.id} likes={votes.likes} dislikes={votes.dislikes} />
         </div>
       </div>
     </div>
