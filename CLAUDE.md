@@ -59,6 +59,52 @@ cd frontend && npm run lint && npx tsc --noEmit
   빈도가 높아지거나 관리자 편집 UI가 필요해지는 시점에 DB 마이그레이션을 별도로
   검토한다. 별도 지시가 있을 때까지 DB로 이전하지 말 것.
 
+## 테스트 구조
+
+### 유닛 테스트 (Vitest + React Testing Library)
+```
+frontend/
+  __tests__/
+    __fixtures__/
+      cities.ts       # CITIES(전체) + MOCK_CITIES(5개) 픽스처
+      votesMap.ts     # MOCK / EMPTY / PARTIAL votesMap
+    __mocks__/
+      next-image.tsx  # next/image 전역 mock (vitest.config.ts alias)
+      next-link.tsx   # next/link 전역 mock (vitest.config.ts alias)
+    lib/
+      data.test.ts         # 도시 데이터 무결성 (14개)
+      cityFilters.test.ts  # filterCities / sortCities 순수 함수 (33개)
+    components/
+      CityCard.test.tsx    # 렌더링, Top3 배지, Link href (10개)
+      CityGrid.test.tsx    # 필터 적용, 결과 없음 메시지 (6개)
+      LikeButtons.test.tsx # 투표 토글, localStorage, Supabase mock (23개)
+      FilterBar.test.tsx   # 드롭다운 렌더링, 초기 상태 (6개)
+```
+- 실행: `cd frontend && npm test`
+- `lib/cityFilters.ts` — CityGrid에서 추출한 순수 함수 (필터링/정렬), 테스트 전용
+
+### E2E 테스트 (Playwright)
+```
+frontend/
+  playwright.config.ts   # baseURL: localhost:3000, webServer: npm run dev
+  e2e/
+    pages/               # Page Object Models
+      home.page.ts       # 홈 페이지 Locator/Action
+      city-detail.page.ts# 상세 페이지 Locator/Action
+    home.spec.ts         # 홈 페이지 로드, 카드 12개 표시
+    filters.spec.ts      # 필터/정렬 UI 상호작용
+    like-buttons.spec.ts # 투표 클릭, localStorage 새로고침 복원
+    city-detail.spec.ts  # 카드 클릭 → 상세 이동, 목록으로 복귀
+```
+- 실행: `cd frontend && npm run test:e2e`
+- UI 디버깅: `npm run test:e2e:ui`
+- 브라우저: Chromium 단일 (MVP)
+- dev 서버 자동 실행 (이미 실행 중이면 재사용)
+
+### 역할 분담 원칙
+- **유닛 테스트**: 필터 로직 정확성, 투표 상태 전환, 컴포넌트 렌더링
+- **E2E 테스트**: 실제 브라우저 클릭 흐름, 페이지 이동, localStorage 새로고침 시나리오
+
 ## 스타일 가이드
 - 메인 색상: `#00c9a7` (초록 강조), `#111827` (카드 배경), `#f0f4ff` (텍스트)
 - Tailwind 클래스와 inline style 혼합 사용 패턴 유지

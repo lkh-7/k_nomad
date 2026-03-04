@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { City, SortType } from "@/types/city";
 import CityCard from "./CityCard";
+import { filterCities, sortCities } from "@/lib/cityFilters";
 
 interface CityGridProps {
   cities: City[];
@@ -18,38 +19,8 @@ interface CityGridProps {
 
 export default function CityGrid({ cities, votesMap, filters, sortBy }: CityGridProps) {
   const filtered = useMemo(() => {
-    let result = [...cities];
-
-    // 필터링 (AND 조건)
-    if (filters.budget !== "전체") result = result.filter((c) => c.budget === filters.budget);
-    if (filters.region !== "전체") result = result.filter((c) => c.regionCategory === filters.region);
-    if (filters.environment !== "전체") result = result.filter((c) => c.environment === filters.environment);
-    if (filters.season !== "전체") result = result.filter((c) => c.bestSeason === filters.season);
-
-    // 정렬
-    switch (sortBy) {
-      case "nomadScore":
-        result.sort((a, b) => b.nomadScore - a.nomadScore);
-        break;
-      case "budgetLow":
-        result.sort((a, b) => a.monthlyBudget - b.monthlyBudget);
-        break;
-      case "budgetHigh":
-        result.sort((a, b) => b.monthlyBudget - a.monthlyBudget);
-        break;
-      case "internetSpeed":
-        result.sort((a, b) => b.internetSpeed - a.internetSpeed);
-        break;
-      case "likes":
-        result.sort((a, b) => {
-          const aLikes = votesMap[a.id]?.likes ?? a.likes;
-          const bLikes = votesMap[b.id]?.likes ?? b.likes;
-          return bLikes - aLikes;
-        });
-        break;
-    }
-
-    return result;
+    const filteredCities = filterCities(cities, filters);
+    return sortCities(filteredCities, sortBy, votesMap);
   }, [cities, votesMap, filters, sortBy]);
 
   if (filtered.length === 0) {
