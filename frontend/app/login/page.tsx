@@ -1,18 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "@/app/actions/auth";
+
+function LoginMessage() {
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message");
+  if (!message) return null;
+  return (
+    <div
+      className="mb-4 px-4 py-3 rounded-lg text-sm text-center"
+      style={{
+        backgroundColor: "rgba(0, 201, 167, 0.1)",
+        border: "1px solid rgba(0, 201, 167, 0.3)",
+        color: "#00c9a7",
+      }}
+    >
+      {message}
+    </div>
+  );
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const searchParams = useSearchParams();
-  const message = searchParams.get("message");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,18 +94,9 @@ export default function LoginPage() {
           </div>
 
           {/* 이메일 인증 안내 메시지 */}
-          {message && (
-            <div
-              className="mb-4 px-4 py-3 rounded-lg text-sm text-center"
-              style={{
-                backgroundColor: "rgba(0, 201, 167, 0.1)",
-                border: "1px solid rgba(0, 201, 167, 0.3)",
-                color: "#00c9a7",
-              }}
-            >
-              {message}
-            </div>
-          )}
+          <Suspense>
+            <LoginMessage />
+          </Suspense>
 
           {/* 카드 */}
           <div
